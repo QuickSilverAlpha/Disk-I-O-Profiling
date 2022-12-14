@@ -1,12 +1,11 @@
-#include <stdlib.h>
-#include <stdio.h>
 #include <time.h>
 #include "helpers.h"
-
-
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 int main(int argc, char* argv[]) { 
-    if(argc < 3) {
+    if(argc < 5) {
         printf("Usage: ./run <filename> [-r|-w] <block_size> <block_count> \n");
         exit(0);
     }
@@ -18,28 +17,22 @@ int main(int argc, char* argv[]) {
 
     printf("Args: %s %s %d %d \n", filename, option, blocksize, blockcount);
     
-    if (option != "-r" || option != "-w") { 
+    if (strcmp(option,"-r") == 0) {
+        clock_t start, end;
+        double execution_time;
+        start = clock();
+        readFile(filename, blocksize, blockcount);
+
+        end = clock();
+        execution_time = ((double)(end - start))/CLOCKS_PER_SEC;
+        printf("Time to complete: %lf \n", execution_time);
+    }    
+    else {
         printf("Error: program only supports '-r' (read) and '-w' (write) operations\n");
         exit(0); 
     }
 
-    if (option == "-r") {
-
-    }
-    else if (option = "-w") {
-
-    }       
-
-    clock_t start, end;
-    double execution_time;
-    start = clock();
-
-    
-
-    end = clock();
-    execution_time = ((double)(end - start))/CLOCKS_PER_SEC;
-
-    return 0;
+    exit(0);
 
 
 }
