@@ -28,6 +28,22 @@ void readFile(char* filename, int blocksize, int blockcount){
         printf("%x\n", xorvalue);
     }
     if(close(fd) != 0) { 
-        printf("Error closing file");
+        printf("Error closing file: %s", filename);
+    }
+}
+
+void writeFile(char* filename, int blocksize, int blockcount){
+    int fd = open(filename, O_WRONLY | O_CREAT, 0644);
+    if (fd < 0){
+        printf("Writing error with file %s!\n",filename);
+    }
+    else {
+        unsigned int buf[blocksize];
+        for (int i=0; i < blockcount; i++){
+            int n = write(fd,buf,blocksize);
+        }
+    }
+    if(close(fd) != 0) { 
+        printf("Error closing file: %s", filename);
     }
 }
