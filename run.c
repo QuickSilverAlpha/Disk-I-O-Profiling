@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include "helpers.h"
+
 
 
 int main(int argc, char* argv[]) { 
@@ -21,11 +23,18 @@ int main(int argc, char* argv[]) {
         exit(0); 
     }
 
+    if (option == "-r") {
+
+    }
+    else if (option = "-w") {
+
+    }       
+
     clock_t start, end;
     double execution_time;
     start = clock();
 
-    /* Put your code here */
+    
 
     end = clock();
     execution_time = ((double)(end - start))/CLOCKS_PER_SEC;
