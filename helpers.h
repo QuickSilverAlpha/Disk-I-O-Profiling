@@ -1,0 +1,1 @@
+unsigned int xorbuf(unsigned int *buffer, int size);
