@@ -5,10 +5,11 @@
 #include <string.h>
 
 int main(int argc, char* argv[]) { 
-    if(argc < 5) {
+    if(argc != 5) {
         printf("Usage: ./run <filename> [-r|-w] <block_size> <block_count> \n");
         exit(0);
     }
+    
 
     char* filename = argv[1]; 
     char* option = argv[2]; 
