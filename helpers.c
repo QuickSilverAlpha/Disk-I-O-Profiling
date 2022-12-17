@@ -13,19 +13,22 @@ unsigned int xorbuf(unsigned int *buffer, int size) {
     return result;
 }
 
-void readFile(char* filename, int blocksize, int blockcount){ 
+void readFile(char* filename, unsigned int blocksize, unsigned int blockcount){ 
     int fd = open(filename, O_RDONLY);
     if (fd < 0) { 
         printf("Error opening file %s\n", filename); 
     }
     else {
         unsigned int xorvalue = 0;
-        unsigned int buffer[blocksize];
+
+        unsigned int* buffer;
+        buffer = (unsigned int*)malloc(blocksize*(sizeof(unsigned int))); //allocate memory in order to make blocksize the size of array
         for(int i = 0; i < blockcount; i++) { 
             int current_read = read(fd, buffer, blocksize);
             xorvalue ^= xorbuf(buffer, current_read);
         }
         printf("%x\n", xorvalue);
+        free(buffer);
     }
     if(close(fd) != 0) { 
         printf("Error closing file: %s", filename);
@@ -40,7 +43,7 @@ void writeFile(char* filename, int blocksize, int blockcount){
     else {
         unsigned int buf[blocksize];
         for (int i=0; i < blockcount; i++){
-            int n = write(fd,buf,blocksize);
+            write(fd,buf,blocksize);
         }
     }
     if(close(fd) != 0) { 

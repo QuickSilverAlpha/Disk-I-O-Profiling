@@ -12,8 +12,8 @@ int main(int argc, char* argv[]) {
 
     char* filename = argv[1]; 
     char* option = argv[2]; 
-    int blocksize = atoi(argv[3]);
-    int blockcount = atoi(argv[4]);
+    unsigned int blocksize = atoi(argv[3]);
+    unsigned int blockcount = atoi(argv[4]);
 
     if (blocksize < 1 ){
         printf("Invalid block size!\n");
