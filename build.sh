@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-gcc -O3 -fno-stack-protector -pthread helpers.c run.c -o run -lm
+gcc -O3 -Wall helpers.c run.c -o run -lm
