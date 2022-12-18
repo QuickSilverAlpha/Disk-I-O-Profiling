@@ -56,7 +56,7 @@ void readFile(char* filename, unsigned int blocksize, unsigned int blockcount){
 
 int readFile_run2(char* filename, unsigned int blocksize) {
     int fd = open(filename, O_RDONLY);
-    int n;
+    int n = 0;
     double start, curr, end;
     if (fd < 0) { 
         printf("Error opening file %s\n", filename); 
@@ -69,10 +69,16 @@ int readFile_run2(char* filename, unsigned int blocksize) {
         buffer = (unsigned int*)malloc(blocksize*(sizeof(unsigned int))); //allocate memory in order to make blocksize the size of array
         start = now();
 		curr = now();
-        
-        while((curr - start < 15) && (n = pread(fd, buffer, blocksize, 0) > 0)) {
+        off_t eof = lseek(fd, 0, SEEK_END); //Must reset lseek to the beginning or will continue from eof in while loop 
+        off_t pos = lseek(fd, 0, SEEK_SET);
+        while((curr - start < 15) && (pos != -1)) {
+            n = pread(fd, buffer, blocksize, pos);
+            pos = lseek(fd, blocksize, SEEK_CUR);
             xorvalue ^= xorbuf(buffer, blocksize);
             blockcount++; 
+            if (pos > eof) { 
+                pos =-1; 
+            }
             curr = now();
         }
         end = now();
