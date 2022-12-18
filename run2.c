@@ -1,11 +1,7 @@
-#include <time.h>
 #include "helpers.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
-
-
 
 
 int main(int argc, char* argv[]) { 
@@ -21,15 +17,9 @@ int main(int argc, char* argv[]) {
         printf("Invalid block size!\n");
         return -1;
     }
-    if (blocksize % 4 != 0 ){
-        printf("Invalid block size! Block size should be multiple of 4!\n");
-        return -1;
-    }
-    unsigned int blockcount = computeSize(filename,blocksize);
 
-    
-   
-
+    int numblocks = readFile_run2(filename, blocksize);
+    printf("Number of blocks read in a resonable time: %d\n", numblocks);
     return 0;
 
 }
