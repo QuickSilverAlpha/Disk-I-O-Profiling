@@ -54,3 +54,9 @@ void writeFile(char* filename, unsigned int blocksize, unsigned int blockcount){
         printf("Error closing file: %s", filename);
     }
 }
+
+unsigned int computeSize(char* filename, unsigned int blocksize){
+    int blockcount; 
+    
+    return blockcount;  
+}
