@@ -7,7 +7,7 @@
 int main(int argc, char* argv[]) { 
     if(argc != 3) {
         printf("Usage: ./run2 <filename> <block_size> \n");
-        exit(0);
+        return -1;
     }
 
     char* filename = argv[1];  

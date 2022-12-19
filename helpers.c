@@ -59,7 +59,7 @@ void readFile(char* filename, unsigned int blocksize, unsigned int blockcount){
 int readFile_run2(char* filename, unsigned int blocksize) {
     int fd = open(filename, O_RDONLY);
     int n;
-    double start, end;
+    double start, curr, end;
     if (fd < 0) { 
         printf("Error opening file %s\n", filename); 
         return -1; 
@@ -69,21 +69,36 @@ int readFile_run2(char* filename, unsigned int blocksize) {
         unsigned int blockcount = 0;
         unsigned int* buffer;
         long buflen;
+        size_t sz;
+
         buffer = (unsigned int*)malloc(blocksize); //allocate memory in order to make blocksize the size of array
         start = now();
-		//curr = now();
+		curr = now();
         //off_t eof = lseek(fd, 0, SEEK_END); //Must reset lseek to the beginning or will continue from eof in while loop 
-        off_t pos = lseek(fd, 0, SEEK_SET);
-        while((n = pread(fd, buffer, blocksize, pos)) > 0) { //(curr - start < 15) &&
+        // off_t pos = lseek(fd, 0, SEEK_SET);
+        while((curr - start <= (double) 15) && (n = read(fd, buffer, blocksize)) > 0) { //(curr - start < 15) &&
             buflen = ceil((double) n / sizeof(unsigned int));
 
-            pos = lseek(fd, blocksize, SEEK_CUR);
+            // pos = lseek(fd, blocksize, SEEK_CUR);
             xorvalue ^= xorbuf(buffer, buflen);
             blockcount++; 
+            curr = now();
         }
         end = now();
 
-        size_t sz = fsize(filename);
+        if (end - start <= (double) 5) {
+            printf("Time to complete read: %f\n", end - start);
+            printf("Already Optimized! Use a bigger file!\n");
+            return blockcount;
+        }
+
+        if (n <= 0) {
+            size_t sz = fsize(filename);
+        }
+        else{
+            size_t sz = blocksize*blockcount;
+        }
+        
         double performance = (end - start);
         double dataRate = (sz/1024.0/1024.0) / ((double)performance); 
         printf("Time to complete read: %f\n", end - start);
