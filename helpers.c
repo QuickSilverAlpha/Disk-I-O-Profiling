@@ -56,8 +56,8 @@ void readFile(char* filename, unsigned int blocksize, unsigned int blockcount){
 
 int readFile_run2(char* filename, unsigned int blocksize) {
     int fd = open(filename, O_RDONLY);
-    int n = 0;
-    double start, curr, end;
+    int n;
+    double start, end;
     if (fd < 0) { 
         printf("Error opening file %s\n", filename); 
         return -1; 
@@ -68,24 +68,30 @@ int readFile_run2(char* filename, unsigned int blocksize) {
         unsigned int* buffer;
         buffer = (unsigned int*)malloc(blocksize*(sizeof(unsigned int))); //allocate memory in order to make blocksize the size of array
         start = now();
-		curr = now();
+		//curr = now();
         off_t eof = lseek(fd, 0, SEEK_END); //Must reset lseek to the beginning or will continue from eof in while loop 
         off_t pos = lseek(fd, 0, SEEK_SET);
-        while((curr - start < 15) && (pos != -1)) {
-            n = pread(fd, buffer, blocksize, pos);
+        while(pos <= eof) { //(curr - start < 15) &&
             pos = lseek(fd, blocksize, SEEK_CUR);
-            xorvalue ^= xorbuf(buffer, blocksize);
-            blockcount++; 
-            if (pos > eof) { 
-                pos =-1; 
+
+            if(pos > eof) {
+                off_t szToRead = pos - eof;
+                n = pread(fd, buffer, szToRead, pos);
+                xorvalue ^= xorbuf(buffer, n);
+                break; 
             }
-            curr = now();
+
+            n = pread(fd, buffer, blocksize, pos);
+            xorvalue ^= xorbuf(buffer, n);
+            blockcount++; 
+            
+            //curr = now();
         }
         end = now();
         printf("Time to complete read: %f\n", end - start);
 
 
-        printf("%x\n", xorvalue);
+        printf("%08x\n", xorvalue);
         free(buffer);
         return blockcount;
     }
