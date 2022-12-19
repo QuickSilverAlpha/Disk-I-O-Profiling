@@ -41,12 +41,18 @@ void readFile(char* filename, unsigned int blocksize, unsigned int blockcount){
     }
     else {
         unsigned int xorvalue = 0;
+        unsigned int current_blockcount = 1;
         int current_read;
         unsigned int* buffer;
         buffer = (unsigned int*)malloc(blocksize); //allocate memory in order to make blocksize the size of array
         while((current_read = read(fd, buffer, blocksize)) > 0) { 
             buflen = ceil((double) current_read / sizeof(unsigned int));
             xorvalue ^= xorbuf(buffer, buflen);
+
+            if (current_blockcount == blockcount){
+                break;
+            }
+            current_blockcount++;
         }
         printf("%x\n", xorvalue);
         free(buffer);
