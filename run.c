@@ -41,7 +41,11 @@ int main(int argc, char* argv[]) {
 
         end = clock();
         execution_time = ((double)(end - start))/CLOCKS_PER_SEC;
-        printf("Time to complete read: %lf \n", execution_time);
+        size_t sz = fsize(filename);
+        double performance = (end - start);
+        double dataRate = (sz/1024.0/1024.0) / ((double)performance); 
+        printf("Time to complete read: %f\n", end - start);
+        printf("Performance: %f MB/Sec\n", dataRate);
     }
 
     else if (strcmp(option,"-w") == 0) {

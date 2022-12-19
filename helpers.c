@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <stddef.h>
 #include <sys/time.h>
+#include <math.h>
 
 double now() {
     struct timeval tv;
@@ -34,17 +35,18 @@ unsigned int xorbuf(unsigned int *buffer, int size) {
 
 void readFile(char* filename, unsigned int blocksize, unsigned int blockcount){ 
     int fd = open(filename, O_RDONLY);
+    long buflen; 
     if (fd < 0) { 
         printf("Error opening file %s\n", filename); 
     }
     else {
         unsigned int xorvalue = 0;
-
+        int current_read;
         unsigned int* buffer;
-        buffer = (unsigned int*)malloc(blocksize*(sizeof(unsigned int))); //allocate memory in order to make blocksize the size of array
-        for(int i = 0; i < blockcount; i++) { 
-            int current_read = read(fd, buffer, blocksize);
-            xorvalue ^= xorbuf(buffer, current_read);
+        buffer = (unsigned int*)malloc(blocksize); //allocate memory in order to make blocksize the size of array
+        while((current_read = read(fd, buffer, blocksize)) > 0) { 
+            buflen = ceil((double) current_read / sizeof(unsigned int));
+            xorvalue ^= xorbuf(buffer, buflen);
         }
         printf("%x\n", xorvalue);
         free(buffer);
@@ -66,30 +68,27 @@ int readFile_run2(char* filename, unsigned int blocksize) {
         unsigned int xorvalue = 0;
         unsigned int blockcount = 0;
         unsigned int* buffer;
-        buffer = (unsigned int*)malloc(blocksize*(sizeof(unsigned int))); //allocate memory in order to make blocksize the size of array
+        long buflen;
+        buffer = (unsigned int*)malloc(blocksize); //allocate memory in order to make blocksize the size of array
         start = now();
 		//curr = now();
-        off_t eof = lseek(fd, 0, SEEK_END); //Must reset lseek to the beginning or will continue from eof in while loop 
+        //off_t eof = lseek(fd, 0, SEEK_END); //Must reset lseek to the beginning or will continue from eof in while loop 
         off_t pos = lseek(fd, 0, SEEK_SET);
-        while(pos <= eof) { //(curr - start < 15) &&
+        while((n = pread(fd, buffer, blocksize, pos)) > 0) { //(curr - start < 15) &&
+            buflen = ceil((double) n / sizeof(unsigned int));
+
             pos = lseek(fd, blocksize, SEEK_CUR);
-
-            if(pos > eof) {
-                off_t szToRead = pos - eof;
-                n = pread(fd, buffer, szToRead, pos);
-                xorvalue ^= xorbuf(buffer, n);
-                break; 
-            }
-
-            n = pread(fd, buffer, blocksize, pos);
-            xorvalue ^= xorbuf(buffer, n);
+            xorvalue ^= xorbuf(buffer, buflen);
             blockcount++; 
-            
-            //curr = now();
         }
         end = now();
-        printf("Time to complete read: %f\n", end - start);
 
+        size_t sz = fsize(filename);
+        double performance = (end - start);
+        double dataRate = (sz/1024.0/1024.0) / ((double)performance); 
+        printf("Time to complete read: %f\n", end - start);
+        printf("Performance: %f MB/Sec\n", dataRate);
+        
 
         printf("%08x\n", xorvalue);
         free(buffer);
@@ -110,10 +109,9 @@ void writeFile(char* filename, unsigned int blocksize, unsigned int blockcount){
     else {
         unsigned int* write_buffer;
         write_buffer = (unsigned int*)malloc(blocksize*(sizeof(unsigned int))); //allocate memory in order to make blocksize the size of array
-
+        
         for (int i=0; i < blockcount; i++){
-            int size = write(fd, write_buffer, blocksize);
-            printf("Wrote %d bytes to file", size); 
+            int n = write(fd, write_buffer, blocksize);
         }
         free(write_buffer);
     }
