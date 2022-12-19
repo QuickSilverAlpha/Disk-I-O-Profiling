@@ -1,4 +1,4 @@
-#include <time.h>
+#include <sys/time.h>
 #include "helpers.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -31,32 +31,35 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    printf("Args: %s %s %d %d \n", filename, option, blocksize, blockcount);
+    //printf("Args: %s %s %d %d \n", filename, option, blocksize, blockcount);
     
     if (strcmp(option,"-r") == 0) {
-        clock_t start, end;
-        double execution_time;
-        start = clock();
+        double start, end;
+        start = now();
         readFile(filename, blocksize, blockcount);
 
-        end = clock();
-        execution_time = ((double)(end - start))/CLOCKS_PER_SEC;
+        end = now();
         size_t sz = fsize(filename);
         double performance = (end - start);
         double dataRate = (sz/1024.0/1024.0) / ((double)performance); 
         printf("Time to complete read: %f\n", end - start);
         printf("Performance: %f MB/Sec\n", dataRate);
+        
+       
     }
 
     else if (strcmp(option,"-w") == 0) {
-        clock_t start, end;
-        double execution_time;
-        start = clock();
+        double start, end;
+        start = now();
         writeFile(filename, blocksize, blockcount);
 
-        end = clock();
-        execution_time = ((double)(end - start))/CLOCKS_PER_SEC;
-        printf("Time to complete write: %lf \n", execution_time);
+        end = now();
+        size_t sz = fsize(filename);
+        double performance = (end - start);
+        double dataRate = (sz/1024.0/1024.0) / ((double)performance); 
+        printf("Time to complete write: %f\n", end - start);
+        printf("Performance: %f MB/Sec\n", dataRate);
+
     }
 
     else {

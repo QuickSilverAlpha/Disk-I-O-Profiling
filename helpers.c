@@ -9,6 +9,8 @@
 #include <sys/time.h>
 #include <math.h>
 
+#define UNUSED(x) (void)(x)
+
 double now() {
     struct timeval tv;
     gettimeofday(&tv, 0);
@@ -97,12 +99,11 @@ int readFile_run2(char* filename, unsigned int blocksize) {
             printf("Already Optimized! Use a bigger file!\n");
             return blockcount;
         }
-
         if (n <= 0) {
-            size_t sz = fsize(filename);
+            sz = fsize(filename);
         }
         else{
-            size_t sz = blocksize*blockcount;
+            sz = blocksize*blockcount;
         }
         
         double performance = (end - start);
@@ -133,6 +134,7 @@ void writeFile(char* filename, unsigned int blocksize, unsigned int blockcount){
         
         for (int i=0; i < blockcount; i++){
             int n = write(fd, write_buffer, blocksize);
+            UNUSED(n);
         }
         free(write_buffer);
     }
