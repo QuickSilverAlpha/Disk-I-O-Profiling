@@ -43,7 +43,7 @@ void readFile(char* filename, unsigned int blocksize, unsigned int blockcount){
     }
     else {
         unsigned int xorvalue = 0;
-        unsigned int current_blockcount = 1;
+        unsigned int cb_read = 1;
         int current_read;
         unsigned int* buffer;
         buffer = (unsigned int*)malloc(blocksize); //allocate memory in order to make blocksize the size of array
@@ -52,10 +52,10 @@ void readFile(char* filename, unsigned int blocksize, unsigned int blockcount){
             xorvalue ^= xorbuf(buffer, buflen);
 
             // Checking block count, if blockcount*blocksize < filesize, it will break the loop.
-            if (current_blockcount == blockcount){
+            if (cb_read == blockcount){
                 break;
             }
-            current_blockcount++;
+            cb_read++;
         }
         printf("%x\n", xorvalue);
         free(buffer);
@@ -128,14 +128,24 @@ void runSysCallAnalysis(char* filename, unsigned int blocksize, unsigned int blo
     double read_start, read_end;
     double lseek_start, lseek_end;
 
+    size_t sz = blockcount*blocksize;
+
+    size_t f_sz = fsize(filename);
+    
+    if(sz > f_sz){
+        printf("ERROR: Enter a valid blockcount! (Blockcount* Blocksize) > Filesize!");
+    }
+
+
+
     int fd = open(filename, O_RDONLY);
 
     if (fd < 0) { 
         printf("Error opening file %s\n", filename); 
     }
     else {
-        unsigned int current_blockcount = 1;
-        unsigned int curr_block_count = 1;
+        unsigned int cb_read = 1;
+        unsigned int cb_lseek = 1;
         int current_read;
         unsigned int* buffer;
         buffer = (unsigned int*)malloc(blocksize); //allocate memory in order to make blocksize the size of array
@@ -145,10 +155,10 @@ void runSysCallAnalysis(char* filename, unsigned int blocksize, unsigned int blo
         printf("Reading file...\n");
         read_start = now();
         while((current_read = read(fd, buffer, blocksize)) > 0) { 
-            if (current_blockcount == blockcount){
+            if (cb_read == blockcount){
                 break;
             }
-            current_blockcount++;
+            cb_read++;
         }
         read_end = now();
         free(buffer);
@@ -162,15 +172,28 @@ void runSysCallAnalysis(char* filename, unsigned int blocksize, unsigned int blo
         while(pos <= eof){
 
             pos = lseek(fd, blocksize, SEEK_CUR);
-            if(curr_block_count == blockcount){
+            if(cb_lseek == blockcount){
                 break;
             }
-            curr_block_count++;
+            cb_lseek++;
         }
         lseek_end = now();
 
-        printf("Read system call time: %f\n", read_end - read_start);
-        printf("Lseek system call time: %f\n", lseek_end - lseek_start);
+        double read_time_taken = read_end - read_start;
+        double read_data_rate_mbps = (sz/1024.0/1024.0) / ((double)read_time_taken);
+        double read_data_rate_bps = (sz) / ((double)read_time_taken);
+
+        double lseek_time_taken = lseek_end - lseek_start;
+        double lseek_data_rate_mbps = (sz/1024.0/1024.0) / ((double)lseek_time_taken);
+        double lseek_data_rate_bps = (sz) / ((double)lseek_time_taken);
+
+        printf("No. of system call(s): %ld\n", sz);
+        printf("Read system call time taken: %f Sec\n", read_time_taken);
+        printf("Read system call read rate: %f MB/Sec\n", read_data_rate_mbps);
+        printf("Read system call read rate: %f B/Sec\n", read_data_rate_bps);
+        printf("Lseek system call time taken: %f Sec\n", lseek_time_taken);
+        printf("Lseek system call time: %f MB/Sec\n", lseek_data_rate_mbps);
+        printf("Lseek system call time: %f B/Sec\n", lseek_data_rate_bps);
     }
 
     if(close(fd) != 0) { 
