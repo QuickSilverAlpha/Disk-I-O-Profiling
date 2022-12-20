@@ -19,10 +19,10 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    if (blocksize % 4 != 0 ){
-        printf("Invalid block size! Block size should be multiple of 4!\n");
-        return -1;
-    }
+    // if (blocksize % 4 != 0 ){
+    //     printf("Invalid block size! Block size should be multiple of 4!\n");
+    //     return -1;
+    // }
 
     if (blockcount < 1) {
         printf("Invalid block count!\n");
