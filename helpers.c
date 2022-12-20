@@ -51,6 +51,7 @@ void readFile(char* filename, unsigned int blocksize, unsigned int blockcount){
             buflen = ceil((double) current_read / sizeof(unsigned int));
             xorvalue ^= xorbuf(buffer, buflen);
 
+            // Checking block count, if blockcount*blocksize < filesize, it will break the loop.
             if (current_blockcount == blockcount){
                 break;
             }
@@ -112,7 +113,7 @@ int readFile_run2(char* filename, unsigned int blocksize) {
         printf("Performance: %f MB/Sec\n", dataRate);
         
 
-        printf("%08x\n", xorvalue);
+        printf("%x\n", xorvalue);
         free(buffer);
         return blockcount;
     }
@@ -121,6 +122,60 @@ int readFile_run2(char* filename, unsigned int blocksize) {
         return -1; 
     }
     return 0; 
+}
+
+void runSysCallAnalysis(char* filename, unsigned int blocksize, unsigned int blockcount){ 
+    double read_start, read_end;
+    double lseek_start, lseek_end;
+
+    int fd = open(filename, O_RDONLY);
+
+    if (fd < 0) { 
+        printf("Error opening file %s\n", filename); 
+    }
+    else {
+        unsigned int current_blockcount = 1;
+        unsigned int curr_block_count = 1;
+        int current_read;
+        unsigned int* buffer;
+        buffer = (unsigned int*)malloc(blocksize); //allocate memory in order to make blocksize the size of array
+
+        // Read the entire file and record the time
+
+        printf("Reading file...\n");
+        read_start = now();
+        while((current_read = read(fd, buffer, blocksize)) > 0) { 
+            if (current_blockcount == blockcount){
+                break;
+            }
+            current_blockcount++;
+        }
+        read_end = now();
+        free(buffer);
+
+        printf("Lseeking file...\n");
+        off_t eof = lseek(fd, 0, SEEK_END);
+        off_t pos = lseek(fd, 0, SEEK_SET);
+
+        lseek_start = now();
+        // lseek the file block by block to cover the entire file
+        while(pos <= eof){
+
+            pos = lseek(fd, blocksize, SEEK_CUR);
+            if(curr_block_count == blockcount){
+                break;
+            }
+            curr_block_count++;
+        }
+        lseek_end = now();
+
+        printf("Read system call time: %f\n", read_end - read_start);
+        printf("Lseek system call time: %f\n", lseek_end - lseek_start);
+    }
+
+    if(close(fd) != 0) { 
+        printf("Error closing file: %s", filename);
+    }
 }
 
 void writeFile(char* filename, unsigned int blocksize, unsigned int blockcount){
