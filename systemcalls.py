@@ -22,7 +22,7 @@ while block_count <= 100000000:
 
 for i in result: 
     varb = i.split("\n")
-    sys_calls = read_time = varb[3].split(": ")[1].strip()
+    sys_calls = varb[3].split(": ")[1].strip()
     read_time = varb[4].split(": ")[1].strip()
     lseek_time = varb[7].split(": ")[1].strip()
     print(f"{sys_calls}:{read_time}:{lseek_time}")
