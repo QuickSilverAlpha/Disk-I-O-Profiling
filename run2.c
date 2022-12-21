@@ -18,8 +18,9 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    int numblocks = readFile_run2(filename, blocksize);
-    printf("Number of blocks read in a resonable time: %d\n", numblocks);
+    unsigned int numblocks = readFile_run2(filename, blocksize);
+    printf("Number of blocks read: %d \n", numblocks);
+    printf("File size read: %ld \n", fsize(filename));
     return 0;
 
 }
