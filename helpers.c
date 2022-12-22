@@ -9,6 +9,8 @@
 #include <sys/time.h>
 #include <sys/mman.h>
 #include <math.h>
+#include <linux/limits.h>
+#include <string.h>
 
 #define UNUSED(x) (void)(x)
 
@@ -204,7 +206,69 @@ void runSysCallAnalysis(char* filename, unsigned int blocksize, unsigned int blo
     }
 }
 
+unsigned int computeOptimalBlock() {
+    char cwd[PATH_MAX];
+    char buf[PATH_MAX];
+    const char* script_name = "/calc_bc_modified.sh";
+    char* abs_script_path; 
+    FILE *fp;
+
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+        printf("Current working dir: %s\n", cwd);
+    } 
+    
+    else {
+        perror("getcwd() error");
+        return 1;
+    }
+
+    abs_script_path = malloc(PATH_MAX);
+    strncpy(abs_script_path, cwd, PATH_MAX);
+    strcat(abs_script_path, script_name);
+
+    const char* delim = " : ";
+    const char* delim1 = " ";
+    char* token;
+
+    if ((fp = popen(abs_script_path, "r")) == NULL) {
+        printf("Error opening pipe!\n");
+        return -1;
+    }
+
+    while (fgets(buf, PATH_MAX, fp) != NULL) {
+        
+        printf("%s", buf);
+        token = strtok(buf, delim);
+        token = strtok(token, delim1);
+
+        while (token != NULL)
+        {
+            
+        }
+        
+        printf("%s\n", token);
+        //while (token )
+    }
+
+    printf("%s", buf);
+
+    if (pclose(fp)) {
+        printf("Command not found or exited with error status\n");
+        return -1;
+    }
+    
+    
+    
+    free(abs_script_path);
+
+    
+}
+
 int readFileFast(char* filename, unsigned int blocksize, unsigned int blockcount) {
+    blocksize = computeOptimalBlock();
+}
+
+int readFileFastMmap(char* filename, unsigned int blocksize, unsigned int blockcount) {
     //unsigned int n;
     unsigned int xorvalue;
     //double start, curr, end;
@@ -277,5 +341,3 @@ void writeFile(char* filename, unsigned int blocksize, unsigned int blockcount){
         printf("Error closing file: %s", filename);
     }
 }
-
-
