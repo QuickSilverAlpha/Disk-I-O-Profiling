@@ -7,6 +7,7 @@
 #include <sys/types.h>
 #include <stddef.h>
 #include <sys/time.h>
+#include <sys/mman.h>
 #include <math.h>
 
 #define UNUSED(x) (void)(x)
@@ -134,6 +135,8 @@ void runSysCallAnalysis(char* filename, unsigned int blocksize, unsigned int blo
     
     if(sz > f_sz){
         printf("ERROR: Enter a valid blockcount! (Blockcount* Blocksize) > Filesize!");
+        // return -1;
+        exit(0);
     }
 
 
@@ -199,6 +202,59 @@ void runSysCallAnalysis(char* filename, unsigned int blocksize, unsigned int blo
     if(close(fd) != 0) { 
         printf("Error closing file: %s", filename);
     }
+}
+
+int readFileFast(char* filename, unsigned int blocksize, unsigned int blockcount) {
+    //unsigned int n;
+    unsigned int xorvalue;
+    //double start, curr, end;
+    // unsigned int curr_blockcount = 1;
+    // unsigned int offset = 0;
+
+    int fd = open(filename, O_RDONLY);
+    if (fd < 0) { 
+        printf("Error opening file %s\n", filename); 
+        return -1; 
+    }
+    else {
+
+        struct stat statbuf;
+        int status;
+        size_t f_sz;
+        size_t pagesize = getpagesize();
+
+        status = fstat(fd, &statbuf);
+        if (status < 0) {
+            printf("File status failed: %s", filename);
+        }
+        f_sz = statbuf.st_size;
+        printf("%ld\n", f_sz);
+
+        char *mmap_block_ptr = mmap(NULL, f_sz, PROT_READ, MAP_SHARED, fd, 0);
+        if(mmap_block_ptr == MAP_FAILED) {
+            printf("Failed mapping!\n");
+            return -1;
+        }
+        printf("Past mmap!\n");
+
+        //ssize_t n = write(1,mmap_block_ptr, f_sz);
+        xorvalue ^= xorbuf((unsigned int*) mmap_block_ptr, f_sz);
+        printf("xorvalue: %x\n", xorvalue);
+
+        int unmap_block_ptr = munmap(mmap_block_ptr, f_sz);
+
+        if(unmap_block_ptr != 0){
+            printf("Failed Unmapping!\n");
+            return -1;
+        }
+
+    }
+
+    if(close(fd) != 0) { 
+        printf("Error closing file: %s", filename);
+        return -1; 
+    }
+    return 0;
 }
 
 void writeFile(char* filename, unsigned int blocksize, unsigned int blockcount){
