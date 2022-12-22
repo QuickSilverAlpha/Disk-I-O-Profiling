@@ -15,7 +15,7 @@ int main(int argc, char* argv[]) {
     unsigned int blockcount = 0;
 
     printf("Init...\n");
-    readFileFastMmap(filename, blocksize, blockcount);
+    readFileFast(filename, blocksize, blockcount);
     //printf("Args: %s %s %d %d \n", filename, option, blocksize, blockcount);
     return 0;
 
