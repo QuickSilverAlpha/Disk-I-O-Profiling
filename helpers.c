@@ -207,9 +207,11 @@ void runSysCallAnalysis(char* filename, unsigned int blocksize, unsigned int blo
 }
 
 unsigned int computeOptimalBlock() {
+    unsigned int blockcount = 0;
     char cwd[PATH_MAX];
     char buf[PATH_MAX];
-    const char* script_name = "/calc_bc_modified.sh";
+    const char* python = "python3 ";
+    const char* script_name = "/calc_blocksize.py";
     char* abs_script_path; 
     FILE *fp;
 
@@ -222,50 +224,44 @@ unsigned int computeOptimalBlock() {
         return 1;
     }
 
-    abs_script_path = malloc(PATH_MAX);
-    strncpy(abs_script_path, cwd, PATH_MAX);
+    abs_script_path = malloc(PATH_MAX + 7);
+    strncpy(abs_script_path, python, PATH_MAX + 7);
+    strcat(abs_script_path, cwd);
     strcat(abs_script_path, script_name);
 
-    const char* delim = " : ";
-    const char* delim1 = " ";
-    char* token;
 
     if ((fp = popen(abs_script_path, "r")) == NULL) {
         printf("Error opening pipe!\n");
         return -1;
     }
 
-    while (fgets(buf, PATH_MAX, fp) != NULL) {
-        
-        printf("%s", buf);
-        token = strtok(buf, delim);
-        token = strtok(token, delim1);
+    while (fgets(buf, PATH_MAX, fp) != NULL) {}
 
-        while (token != NULL)
-        {
-            
-        }
-        
-        printf("%s\n", token);
-        //while (token )
-    }
-
-    printf("%s", buf);
+    blockcount = (unsigned int*)(atoi(buf));
 
     if (pclose(fp)) {
         printf("Command not found or exited with error status\n");
         return -1;
     }
     
-    
-    
     free(abs_script_path);
-
+    printf("Blocksize for optimized read: %d\n", blockcount);
+    return blockcount;
     
 }
 
-int readFileFast(char* filename, unsigned int blocksize, unsigned int blockcount) {
-    blocksize = computeOptimalBlock();
+void readFileFast(char* filename) {
+    unsigned int block_sz;
+    double start, end;
+    size_t f_sz = fsize(filename);
+    block_sz = computeOptimalBlock();
+    start = now();
+    readFile(filename, block_sz, 10000000);
+    end = now();
+    double performance = (end - start);
+    double dataRate = (f_sz/1024.0/1024.0) / ((double)performance); 
+    printf("Time to complete read: %f\n", end - start);
+    printf("Performance: %f MB/Sec\n", dataRate);
 }
 
 int readFileFastMmap(char* filename, unsigned int blocksize, unsigned int blockcount) {
