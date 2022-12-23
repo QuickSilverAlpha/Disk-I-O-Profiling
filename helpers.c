@@ -60,7 +60,7 @@ void readFile(char* filename, unsigned int blocksize, unsigned int blockcount){
             }
             cb_read++;
         }
-        printf("%x\n", xorvalue);
+        printf("xorvalue: %x\n", xorvalue);
         free(buffer);
     }
     if(close(fd) != 0) { 
@@ -116,7 +116,7 @@ int readFile_run2(char* filename, unsigned int blocksize) {
         printf("Performance: %f MB/Sec\n", dataRate);
         
 
-        printf("%x\n", xorvalue);
+        printf("xorvalue: %x\n", xorvalue);
         free(buffer);
         return blockcount;
     }

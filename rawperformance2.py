@@ -21,7 +21,7 @@ while block_size <= 100000:
     print("Program output:", output)
     result.append(output)
     dataRate = (filesize.st_size/1024.0/1024.0) / (end-start) 
-    print("Python time: ", end - start, "Block size: ", block_size, "\n")
+    print("Python time: ", end - start,"\n")
     block_size += 1000
     print("--------------------------------------")
 
