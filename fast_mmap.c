@@ -6,7 +6,7 @@
 
 int main(int argc, char* argv[]) { 
     if(argc != 2) {
-        printf("Usage: ./fast <filename>\n");
+        printf("Usage: ./fast_mmap <filename>\n");
         exit(0);
     }
 

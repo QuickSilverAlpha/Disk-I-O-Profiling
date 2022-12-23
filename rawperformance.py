@@ -8,16 +8,16 @@ def clearCache():
     os.system(cmd)  
 
 #Part 2
-filename = "ubuntu-22.04.1-desktop-amd64.iso"
+filename = "ubuntu-21.04-desktop-amd64.iso"
 block_size = 1000
 abspath = os.path.join(os.getcwd(), filename)
 filesize = os.stat(abspath)
 
 result = []
 while block_size <= 100000: 
-    clearCache()
+    #clearCache()
     start = time.perf_counter() 
-    output = os.popen(f"./run {filename} -r {block_size} 1000000").read() #block count 10,000,000, size of file is 2.8 GB
+    output = os.popen(f"./run {filename} -r {block_size} 10000000").read() #block count 10,000,000, size of file is 2.8 GB
     end = time.perf_counter()
     print("Program output:", output)
     result.append(output)

@@ -237,7 +237,7 @@ unsigned int computeOptimalBlock() {
 
     while (fgets(buf, PATH_MAX, fp) != NULL) {}
 
-    blockcount = (unsigned int*)(atoi(buf));
+    blockcount = (atoi(buf));
 
     if (pclose(fp)) {
         printf("Command not found or exited with error status\n");
@@ -266,7 +266,7 @@ void readFileFast(char* filename) {
 
 int readFileFastMmap(char* filename, unsigned int blocksize, unsigned int blockcount) {
     //unsigned int n;
-    unsigned int xorvalue;
+    unsigned int xorvalue = 0;
     //double start, curr, end;
     // unsigned int curr_blockcount = 1;
     // unsigned int offset = 0;
@@ -281,7 +281,6 @@ int readFileFastMmap(char* filename, unsigned int blocksize, unsigned int blockc
         struct stat statbuf;
         int status;
         size_t f_sz;
-        size_t pagesize = getpagesize();
 
         status = fstat(fd, &statbuf);
         if (status < 0) {
