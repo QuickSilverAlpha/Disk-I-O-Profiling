@@ -11,11 +11,9 @@ int main(int argc, char* argv[]) {
     }
 
     char* filename = argv[1];
-    unsigned int blocksize = 0;
-    unsigned int blockcount = 0;
 
     printf("Init...\n");
-    readFileFast(filename, blocksize, blockcount);
+    readFileFast(filename);
     //printf("Args: %s %s %d %d \n", filename, option, blocksize, blockcount);
     return 0;
 
