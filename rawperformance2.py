@@ -14,19 +14,21 @@ filesize = os.stat(abspath)
 
 result = []
 while block_size <= 100000: 
-    # clearCache()
+    #clearCache()
     start = time.perf_counter() 
     output = os.popen(f"./fast {filename}").read() #block count 10,000,000, size of file is 2.8 GB
     end = time.perf_counter()
     print("Program output:", output)
     result.append(output)
     dataRate = (filesize.st_size/1024.0/1024.0) / (end-start) 
-    print("Python time: ", end - start, "Block size: ", block_size, "\n")
+    print("Python time: ", end - start, "\n")
     block_size += 1000
     print("--------------------------------------")
 
 
+actual_result = []
+for i in result: 
+    varb = i.split("\n")
+    actual_result.append(varb[5].split(": ")[1].strip())
 
-
-#parsed = [float(i) for i in output.split() if float(i) else ]
-#print("Program output: \n", parsed)
+print(actual_result)
