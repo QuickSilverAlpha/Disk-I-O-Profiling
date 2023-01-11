@@ -1,5 +1,4 @@
 # Disk-I-O-Profiling
-Measuring performance of I/O systemcalls under various scenarios
 
 2022-10-28 by Kamen
 
